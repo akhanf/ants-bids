@@ -3,7 +3,7 @@
 import snakebids
 from snakebids import bids
 
-configfile: workflow.source_path('../config/snakebids.yml')
+configfile: 'config/snakebids.yml'
 
 sbi = snakebids.generate_inputs(
     bids_dir=config["bids_dir"],
