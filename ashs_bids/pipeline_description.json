@@ -1,0 +1,23 @@
+{
+    "Name": "ashs_bids - SnakeBIDS app for ASHS hippocampal subfield segmentation",
+    "BIDSVersion": "1.4.0",
+    "DatasetType": "derivative",
+    "PipelineDescription":
+        {
+            "Name": "ashs_bids",
+            "Version": "0.1.0",
+            "CodeURL": "http://github.com/akhanf/ashs_bids",
+            "Author": "Ali Khan",
+            "AuthorEmail": "ali.khan@uwo.ca"
+        },
+    "GeneratedBy": [
+        {
+            "Name": "ashs_bids",
+            "Version": "0.1.0",
+            "CodeURL": "http://github.com/akhanf/ashs_bids",
+            "Author": "Ali Khan",
+            "AuthorEmail": "ali.khan@uwo.ca"
+ 
+        }
+    ]
+}

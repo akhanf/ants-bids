@@ -1,0 +1,80 @@
+#---- begin snakebids boilerplate ----------------------------------------------
+
+import snakebids
+from snakebids import bids
+
+configfile: workflow.source_path('../config/snakebids.yml')
+
+sbi = snakebids.generate_inputs(
+    bids_dir=config["bids_dir"],
+    pybids_inputs=config["pybids_inputs"],
+    pybids_database_dir=config.get("pybids_db_dir"),
+    pybids_reset_database=config.get("pybids_db_reset"),
+    derivatives=config.get("derivatives", None),
+    participant_label=config.get("participant_label", None),
+    exclude_participant_label=config.get("exclude_participant_label", None),
+    use_bids_inputs=True,
+)
+
+
+#this adds constraints to the bids naming
+wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_inputs'])
+
+#---- end snakebids boilerplate ------------------------------------------------
+rule all:
+    input:
+        out_dir=expand(
+                bids(root='ashs',include_subject_dir=False,**sbi.subj_wildcards),
+                subject=sbi.subjects,
+                session=sbi.sessions)
+
+def get_T1w(wildcards):
+    
+    #get the list of scans for the subject
+    scans_zip_list = snakebids.filter_list(sbi.input_zip_lists['T1w'], wildcards)
+
+    #return the first scan for the subject
+    return expand(sbi.input_path['T1w'],zip,**scans_zip_list)[0]
+ 
+def get_T2w(wildcards):
+    
+    #get the list of scans for the subject
+    scans_zip_list = snakebids.filter_list(sbi.input_zip_lists['T2w'], wildcards)
+
+    #return the first scan for the subject
+    return expand(sbi.input_path['T2w'],zip,**scans_zip_list)[0]
+
+                           
+        
+print(bids(root='ashs',**sbi.subj_wildcards))
+
+rule download_ashs:
+    params:
+        url=config['ashs_url']
+    output: directory('resources/ashs-bin')
+    shadow: 'minimal'
+    shell: 'wget  {params.url} -O temp.zip && unzip temp.zip && mv ashs-fastashs_beta {output}'
+
+rule extract_atlas:
+    input: 
+        atlas_tgz = config['atlas_tgz']
+    output:
+        atlas_dir = directory('resources/atlas')
+    shell:
+        'mkdir -p {output} && tar -C {output} -xvzf {input}' 
+rule ashs:
+    input:
+        t1 = get_T1w,
+        t2 = get_T2w,  
+        atlas = rules.extract_atlas.output,
+        ashs = rules.download_ashs.output
+    params:
+        ashs_root='ashs/ashs-fastashs_beta'
+    output:
+        out_dir=directory(bids(root='ashs',include_subject_dir=False,**sbi.subj_wildcards))
+    shell:
+        'export ASHS_ROOT=$(realpath {input.ashs}) && '
+        '$ASHS_ROOT/bin/ashs_main.sh -g {input.t1} -f {input.t2} '  
+        '-w {output.out_dir} -a {input.atlas} -P '
+
+
