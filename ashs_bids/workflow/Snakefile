@@ -46,7 +46,7 @@ def get_T2w(wildcards):
 
                            
         
-print(bids(root='ashs',**sbi.subj_wildcards))
+localrules: download_ashs, extract_atlas
 
 rule download_ashs:
     params:
@@ -72,9 +72,16 @@ rule ashs:
         ashs_root='ashs/ashs-fastashs_beta'
     output:
         out_dir=directory(bids(root='ashs',include_subject_dir=False,**sbi.subj_wildcards))
+    group: 'subj'
+    threads: 8
+    resources:
+        mem_mb=32000,
+        time=180
+    shadow: 'minimal'
+    log: bids(root='logs',suffix='ashs.txt',include_subject_dir=False,**sbi.subj_wildcards)
     shell:
         'export ASHS_ROOT=$(realpath {input.ashs}) && '
         '$ASHS_ROOT/bin/ashs_main.sh -g {input.t1} -f {input.t2} '  
-        '-w {output.out_dir} -a {input.atlas} -P '
+        '-w {output.out_dir} -a {input.atlas} > {log} '
 
 

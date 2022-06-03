@@ -1,5 +1,5 @@
 ashs_url: 'https://www.nitrc.org/frs/download.php/10887/ashs-fastashs_2.0.0_07202018.zip'
-atlas_tgz: '/home/ROBARTS/alik/graham/ctb/ext-data/hippocampal_subfield_group/magdeburg_ashes_atlas/ashs_atlas_magdeburg_7t_20180416.tgz'
+atlas_tgz: '/project/6050199/ext-data/hippocampal_subfield_group/magdeburg_ashes_atlas/ashs_atlas_magdeburg_7t_20180416.tgz'
 
 #this configures the pybids grabber - create an entry for each type of input you want to grab
 # indexed by name of input
